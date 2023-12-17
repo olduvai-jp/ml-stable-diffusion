@@ -14,7 +14,8 @@ import coremltools as ct
 from diffusers import (
     StableDiffusionPipeline,
     DiffusionPipeline,
-    ControlNetModel
+    ControlNetModel,
+    LCMScheduler
 )
 import gc
 
@@ -1294,6 +1295,10 @@ def get_pipeline(args):
                                             variant="fp16",
                                             use_safetensors=True,
                                             use_auth_token=True)
+
+    pipe.load_lora_weights("latent-consistency/lcm-lora-sdv1-5", adapter_name="lcm")
+
+    pipe.scheduler = LCMScheduler.from_config(pipe.scheduler.config)
 
     logger.info(f"Done. Pipeline in effect: {pipe.__class__.__name__}")
 
