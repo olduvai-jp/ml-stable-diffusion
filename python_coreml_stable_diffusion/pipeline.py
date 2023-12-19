@@ -15,6 +15,7 @@ from diffusers.schedulers import (
     EulerDiscreteScheduler,
     LMSDiscreteScheduler,
     PNDMScheduler,
+    LCMScheduler
 )
 from diffusers.schedulers.scheduling_utils import SchedulerMixin
 
@@ -60,7 +61,8 @@ class CoreMLStableDiffusionPipeline(DiffusionPipeline):
                 EulerAncestralDiscreteScheduler,
                 EulerDiscreteScheduler,
                 LMSDiscreteScheduler,
-                PNDMScheduler
+                PNDMScheduler,
+                LCMScheduler,
             ],
             tokenizer: CLIPTokenizer,
             controlnet: Optional[List[CoreMLModel]],
@@ -568,7 +570,8 @@ def get_available_schedulers():
                       EulerAncestralDiscreteScheduler,
                       EulerDiscreteScheduler,
                       LMSDiscreteScheduler,
-                      PNDMScheduler]:
+                      PNDMScheduler,
+                      LCMScheduler]:
         schedulers[scheduler().__class__.__name__.replace("Scheduler", "")] = scheduler
     return schedulers
 
