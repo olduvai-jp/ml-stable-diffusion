@@ -71,7 +71,7 @@ struct StableDiffusionSample: ParsableCommand {
     @Option(help: "Compute units to load model with {all,cpuOnly,cpuAndGPU,cpuAndNeuralEngine}")
     var computeUnits: ComputeUnits = .all
 
-    @Option(help: "Scheduler to use, one of {pndm, dpmpp}")
+    @Option(help: "Scheduler to use, one of {pndm, dpmpp, lcm}")
     var scheduler: SchedulerOption = .lcm
 
     @Option(help: "Random number generator to use, one of {numpy, torch, nvidia}")
