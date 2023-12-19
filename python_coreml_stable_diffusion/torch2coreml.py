@@ -15,7 +15,7 @@ from diffusers import (
     StableDiffusionPipeline,
     DiffusionPipeline,
     ControlNetModel,
-    LCMScheduler
+#    LCMScheduler
 )
 import gc
 
@@ -1296,9 +1296,9 @@ def get_pipeline(args):
                                             use_safetensors=True,
                                             use_auth_token=True)
 
-    pipe.load_lora_weights("latent-consistency/lcm-lora-sdv1-5", adapter_name="lcm")
+    #pipe.load_lora_weights("latent-consistency/lcm-lora-sdv1-5", adapter_name="lcm")
 
-    pipe.scheduler = LCMScheduler.from_config(pipe.scheduler.config)
+    #pipe.scheduler = LCMScheduler.from_config(pipe.scheduler.config)
 
     logger.info(f"Done. Pipeline in effect: {pipe.__class__.__name__}")
 
