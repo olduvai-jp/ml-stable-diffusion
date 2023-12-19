@@ -5,6 +5,6 @@ YAML_PATH=/Users/daiki/Documents/projects/sd-models/checkpoints/v1-inference.yam
 DF_OUTPUT_DIR=/Users/daiki/Documents/projects/sd-models/diffusers/Any45LCM
 
 # --from_safetensors 
-python ckpt2diff.py --from_safetensors --checkpoint_path $SD_CHECKPOINT \
+python ckpt2diffusers.py --from_safetensors --checkpoint_path $SD_CHECKPOINT \
   --original_config_file $YAML_PATH \
   --dump_path $DF_OUTPUT_DIR
