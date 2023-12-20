@@ -50,6 +50,8 @@ public final class LCMScheduler: Scheduler {
     // Stores solverOrder (2) items
     public private(set) var modelOutputs: [MLShapedArray<Float32>] = []
 
+    private var random: RandomSource
+
     /// Create a scheduler that uses a second order DPM-Solver++ algorithm.
     ///
     /// - Parameters:
@@ -72,8 +74,11 @@ public final class LCMScheduler: Scheduler {
         predictionType: String = "epsilon",
         thresholding: Bool = false,
         timeStepSpacing: TimeStepSpacing = .leading,
-        timestepScaling: Float = 10.0
+        timestepScaling: Float = 10.0,
+        randomSource: RandomSource
     ) {
+        self.random = randomSource
+
         self.trainStepCount = trainStepCount
         self.inferenceStepCount = stepCount
         
@@ -196,17 +201,21 @@ public final class LCMScheduler: Scheduler {
         var predictedOriginalSample = output
         predictedOriginalSample.withUnsafeMutableShapedBufferPointer { (pt, shape, stride) in
             if config.predictionType == "epsilon" {
+                let sqrtAlphaProdT = sqrt(alphaProdT)
+                let sqrtBetaProdT = sqrt(betaProdT)
                 sample.withUnsafeShapedBufferPointer { (s, _, _) in
                     for i in pt.indices {
-                        pt[i] = (s[i] - sqrt(betaProdT) * pt[i]) / sqrt(alphaProdT)
+                        pt[i] = (s[i] - sqrtBetaProdT * pt[i]) / sqrtAlphaProdT
                     }
                 }
             } else if config.predictionType == "sample" {
                 return
             } else if config.predictionType == "v_prediction" {
+                let sqrtAlphaProdT = sqrt(alphaProdT)
+                let sqrtBetaProdT = sqrt(betaProdT)
                 sample.withUnsafeShapedBufferPointer { (s, _, _) in
                     for i in pt.indices {
-                        pt[i] = sqrt(alphaProdT) * s[i] - sqrt(betaProdT) * pt[i]
+                        pt[i] = sqrtAlphaProdT * s[i] - sqrtBetaProdT * pt[i]
                     }
                 }
             } else {
@@ -233,12 +242,13 @@ public final class LCMScheduler: Scheduler {
 
         var prevSample = denoised
         if stepIndex != inferenceStepCount - 1 {
-            var random = TorchRandomSource(seed: config.seed)
-            let noise = random.normalShapedArray(output.shape, mean: 0.0, stdev: 1.0)
+            let sqrtAlpha = sqrt(alphaProdTPrev)
+            let sqrtBeta = sqrt(betaProdTPrev)
+            let noise = MLShapedArray<Float32>(converting: self.random.normalShapedArray(output.shape, mean: 0.0, stdev: 1.0))
             prevSample.withUnsafeMutableShapedBufferPointer { (pt, _, _) in
                 noise.withUnsafeShapedBufferPointer { (n, _, _) in
                     for i in pt.indices {
-                        pt[i] = sqrt(alphaProdTPrev) * pt[i] + sqrt(betaProdTPrev) * Float(n[i])
+                        pt[i] = sqrtAlpha * pt[i] + sqrtBeta * n[i]
                     }
                 }
             }
