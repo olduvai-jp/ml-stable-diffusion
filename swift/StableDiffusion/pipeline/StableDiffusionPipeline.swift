@@ -230,7 +230,7 @@ public struct StableDiffusionPipeline: StableDiffusionPipelineProtocol {
             switch config.schedulerType {
             case .pndmScheduler: return PNDMScheduler(stepCount: config.stepCount)
             case .dpmSolverMultistepScheduler: return DPMSolverMultistepScheduler(stepCount: config.stepCount, timeStepSpacing: config.schedulerTimestepSpacing)
-            case .lcmScheduler: return LCMScheduler(stepCount: config.stepCount, timeStepSpacing: config.schedulerTimestepSpacing)
+            case .lcmScheduler: return LCMScheduler(stepCount: config.stepCount, timeStepSpacing: config.schedulerTimestepSpacing, randomSource: randomSource(from: config.rngType, seed: config.seed))
             }
         }
 
